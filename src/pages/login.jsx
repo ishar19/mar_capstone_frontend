@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { register } from "../services/auth";
-import { useNavigate } from "react-router-dom";
-function Register() {
+import { login } from "../services/auth";
+import toast from "react-hot-toast";
+export default function Login() {
     const [userData, setUserData] = useState({
-        name: null,
         email: null,
         password: null
     })
-    const navigate = useNavigate();
     const handleChange = (e) => {
         setUserData({
             ...userData,
@@ -16,28 +14,27 @@ function Register() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!userData.name || !userData.email || !userData.password) {
+        if (!userData.email || !userData.password) {
             return;
         }
         try {
-            const { name, email, password } = userData;
-            const response = await register({ name, email, password })
+            const { email, password } = userData;
+            const response = await login({ email, password })
             console.log(response);
             if (response.status === 200) {
-                alert('User created successfully');
-                navigate('/login');
-
+                const { data } = response;
+                localStorage.setItem('token', data.token);
+                toast.success('User logged in successfully');
             }
         }
         catch (error) {
-            console.log(error.message);
+            toast.error("login failed");
         }
     }
     return (
         <div>
-            <h1>Create an account</h1>
+            <h1>Login</h1>
             <form onSubmit={handleSubmit}>
-                <input name="name" value={userData.name} onChange={handleChange} type="text" placeholder="Your name" />
                 <input name="email" value={userData.email} onChange={handleChange} type="email" placeholder="Your email" />
                 <input name="password" value={userData.password} onChange={handleChange} type="password" placeholder="Your password" />
                 <button type="submit">Submit</button>
@@ -45,6 +42,3 @@ function Register() {
         </div>
     );
 }
-
-
-export default Register;
