@@ -6,6 +6,7 @@ export default function Login() {
         email: null,
         password: null
     })
+    const [loading, setLoading] = useState(false);
     const handleChange = (e) => {
         setUserData({
             ...userData,
@@ -13,6 +14,7 @@ export default function Login() {
         })
     }
     const handleSubmit = async (e) => {
+        setLoading(true);
         e.preventDefault();
         if (!userData.email || !userData.password) {
             return;
@@ -30,6 +32,9 @@ export default function Login() {
         catch (error) {
             toast.error("login failed");
         }
+        finally {
+            setLoading(false);
+        }
     }
     return (
         <div>
@@ -37,7 +42,7 @@ export default function Login() {
             <form onSubmit={handleSubmit}>
                 <input name="email" value={userData.email} onChange={handleChange} type="email" placeholder="Your email" />
                 <input name="password" value={userData.password} onChange={handleChange} type="password" placeholder="Your password" />
-                <button type="submit">Submit</button>
+                <button disabled={loading} type="submit">Submit</button>
             </form>
         </div>
     );

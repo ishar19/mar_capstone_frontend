@@ -7,6 +7,7 @@ function Register() {
         email: null,
         password: null
     })
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const handleChange = (e) => {
         setUserData({
@@ -16,6 +17,7 @@ function Register() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         if (!userData.name || !userData.email || !userData.password) {
             return;
         }
@@ -30,7 +32,11 @@ function Register() {
             }
         }
         catch (error) {
+
             console.log(error.message);
+        }
+        finally {
+            setLoading(false);
         }
     }
     return (
@@ -40,7 +46,7 @@ function Register() {
                 <input name="name" value={userData.name} onChange={handleChange} type="text" placeholder="Your name" />
                 <input name="email" value={userData.email} onChange={handleChange} type="email" placeholder="Your email" />
                 <input name="password" value={userData.password} onChange={handleChange} type="password" placeholder="Your password" />
-                <button type="submit">Submit</button>
+                <button disabled={loading} type="submit">Submit</button>
             </form>
         </div>
     );
