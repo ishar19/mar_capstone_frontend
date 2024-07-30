@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { createJob } from '../services/job';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getJobs } from '../services/job';
 import toast from 'react-hot-toast';
 const SKILLS = [
     {
@@ -33,6 +36,7 @@ const SKILLS = [
 ]
 
 export default function Create() {
+    const { id } = useParams();
     const [formData, setFormData] = useState({
         companyName: null,
         logoUrl: null,
@@ -65,10 +69,12 @@ export default function Create() {
         const data = { ...formData };
         data.skills = data.skills.join(',');
         try {
-            const response = await createJob({ data });
+            const jobId = id ? id : null;
+            const response = await createJob({ data, id: jobId });
             console.log(response);
             if (response.status === 201) {
-                toast.success('Job created successfully');
+                jobId ? toast.success('Job updated successfully') : toast.success('Job created successfully');
+                setFormData(response.data);
             }
             else {
                 toast.error('Job creation failed');
@@ -81,6 +87,17 @@ export default function Create() {
             setLoading(false);
         }
     }
+    useEffect(() => {
+        const fetchJob = async () => {
+            const response = await getJobs({ id });
+            if (response.status === 200) {
+                setFormData(response.data);
+            }
+        }
+        if (id) {
+            fetchJob();
+        }
+    }, [])
     return (
         <div>
             <h1>Create</h1>
@@ -102,13 +119,13 @@ export default function Create() {
                 <input onChange={handleChange} value={formData.location} type="text" name="location" id="" placeholder="Location" />
                 <textarea onChange={handleChange} value={formData.description} name="description" id="" placeholder="Description"></textarea>
                 <textarea onChange={handleChange} value={formData.about} name="about" id="" placeholder="About"></textarea>
-                <select onChange={handleChange} value={formData.skills} name="skills" id="" multiple  >
+                <select onChange={handleChange} name="skills" id="" multiple  >
                     {SKILLS.map((skill, idx) => (
-                        <option key={idx} value={skill.value}>{skill.label}</option>
+                        <option selected={formData.skills.includes(skill.value)} key={idx} value={skill.value}>{skill.label}</option>
                     ))}
                 </select>
                 <input onChange={handleChange} value={formData.information} type="text" name="information" id="" placeholder="Information" />
-                <button disabled={loading} type="submit">Submit</button>
+                {id ? <button disabled={loading} type="submit">Update</button> : <button disabled={loading} type="submit">Submit</button>}
             </form>
         </div>
     );
