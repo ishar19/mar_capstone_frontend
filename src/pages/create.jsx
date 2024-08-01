@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getJobs } from '../services/job';
 import toast from 'react-hot-toast';
-const SKILLS = [
+export const SKILLS = [
     {
         value: 'React',
         label: 'React'
